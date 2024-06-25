@@ -9,8 +9,16 @@ const HomePage = () => {
   const [games, setGames] = useState([]);
 
   useEffect(() => {
-    axios.get('/api/game.json')
-      .then(response => {
+    const fetchData = async () => {
+      try {
+        const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzdXBlcmFkbWlucGFyZWV0bWFya2V0QCM3NSIsImV4cGlyZXNJbiI6IjFkIiwiaWF0IjoxNzE5MTk3NDIwLCJleHAiOjE3MjE3ODk0MjB9.vcbaMLj7_-R4hplFJ0Ha2uMfrcAA8c-AIAsXdgkXWvg';
+  
+        const response = await axios.get('https://api.klubbl.in/panaboard/boards', {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+  
         const allGames = response.data.data;
         const excludedIds = [
           215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230,
@@ -18,13 +26,18 @@ const HomePage = () => {
           248, 249, 250, 251, 252, 253, 254, 255, 256, 257, 258, 259, 260, 261, 262, 263,
           264, 265, 266, 267, 268, 269, 270, 271
         ];
+  
         const filteredGames = allGames.filter(game => !excludedIds.includes(game.id));
         setGames(filteredGames);
-      })
-      .catch(error => {
+      } catch (error) {
         console.error('Error fetching games:', error);
-      });
+        // Optionally, set error state to provide feedback to the user
+      }
+    };
+  
+    fetchData();
   }, []);
+  
 
   const getIcon = (gameName) => {
     switch (gameName.toLowerCase()) {
