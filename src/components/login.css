@@ -1,0 +1,109 @@
+body {
+  background: #FEFFEC;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #212529;
+  text-align: left;
+}
+
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.left-panel button {
+  background-color: #ffc107;
+  color: black;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 5px;
+  margin-bottom: 700px;
+  margin-left: 90%;
+  margin-top: 10px;
+}
+
+.login-form {
+  background-color: transparent;
+  padding: 40px;
+  margin-left: -20%;
+  margin-top: -350%;
+  width: 140%;
+}
+
+.login-form h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.login-form .user {
+  margin-bottom: 15px;
+}
+
+.login-form .user input {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+
+.login-form .captcha {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.login-form .captcha span {
+  background-color: #05FFFC;
+}
+
+.login-form .captcha button {
+  background-color: #BF0000;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 5px;
+  margin-left: 10px;
+}
+
+.login-form .error-message {
+  color: #BF0000;
+  margin-bottom: 15px;
+}
+
+.login-form .actions {
+  display: flex;
+  justify-content: center;
+}
+
+.login-form .actions button {
+  background-color: #BF0000;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 5px;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.result button {
+  background-color: #ffc107;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 5px;
+  width: 100%;
+  margin-top: 20px;
+}
