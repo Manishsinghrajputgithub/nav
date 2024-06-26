@@ -12,12 +12,17 @@ const HomePage = () => {
     const fetchData = async () => {
       try {
         const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzdXBlcmFkbWlucGFyZWV0bWFya2V0QCM3NSIsImV4cGlyZXNJbiI6IjFkIiwiaWF0IjoxNzE5MTk3NDIwLCJleHAiOjE3MjE3ODk0MjB9.vcbaMLj7_-R4hplFJ0Ha2uMfrcAA8c-AIAsXdgkXWvg';
+        const config = {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        };
   
         const response = await axios.get('https://api.klubbl.in/panaboard/boards', {
           headers: {
             Authorization: `Bearer ${token}`
           }
-        });
+        },config);
   
         const allGames = response.data.data;
         const excludedIds = [

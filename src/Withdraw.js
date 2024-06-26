@@ -9,8 +9,21 @@ const Withdraw = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://34.131.61.117/wallets/user-wallet?include=renderable');
-        setData(response.data);
+        const response = await axios.get('https://api.klubbl.in/wallets/user-wallet?include=renderable', {
+          headers: {
+            Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJaUE14VmhHWjV3Tzd0N2xGZzdXZ2RwUW0zZVAyQCMxMTYiLCJleHBpcmVzSW4iOiIxZCIsImlhdCI6MTcxOTMwMDM1OSwiZXhwIjoxNzIxODkyMzU5fQ.OmuaoA95arrvck2A0wp2mMKzI8jXjnHAHGBcSc-V_K8'
+          }
+        });
+
+        const data = response.data.data;
+        
+        // Check if data is an array
+        if (Array.isArray(data)) {
+          setData(data);
+        } else {
+          setData([]); // Fallback to an empty array
+        }
+
         setLoading(false);
       } catch (error) {
         console.error('Error fetching data:', error);
