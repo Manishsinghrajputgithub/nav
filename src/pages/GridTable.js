@@ -80,7 +80,7 @@ const GridTable = () => {
       const quantities = inputs.map(row => row.reduce((acc, val) => acc + (parseInt(val) || 0), 0));
       const amounts = quantities.map(qty => qty * 11);
 
-      const totalAmount = amounts.reduce((acc, amount) => acc + amount, 0);
+      const totalAmount = amounts.reduce((acc, amount) =>amount, 0);
       setBalancePoints(totalAmount);
 
       const response = await axios.post('https://api.klubbl.in/panaboard/submitBid', {
