@@ -22,8 +22,8 @@ function App() {
 
         <Route path="/next-page" element={<GridTable/>} />
         <Route path="/register" element={<Register/>} />
-        <Route path="/total-sale-report" element={<TotalsaleReport />} />
-        <Route path="/next-page2" element={<Withdraw />} />
+        <Route path="/report" element={<TotalsaleReport />} />
+        <Route path="/withdraw" element={<Withdraw />} />
       </Routes>
       <ToastContainer/>
 

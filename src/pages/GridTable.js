@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Link, useLocation } from 'react-router-dom';
 
 const GridTable = () => {
   const [inputs, setInputs] = useState(
@@ -8,6 +9,9 @@ const GridTable = () => {
   const [balancePoints, setBalancePoints] = useState(10);
   const [currentTime, setCurrentTime] = useState('');
   const [timeLeft, setTimeLeft] = useState(900);
+  const { state } = useLocation(); // Access location state to get username
+
+  const username = state ? state.username : ''; // Retrieve username from location state
 
   useEffect(() => {
     const firstLogin = localStorage.getItem('firstLogin');
@@ -52,6 +56,9 @@ const GridTable = () => {
   const formattedTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 
   const handleInputChange = (row, col, value) => {
+    if (value === '-' || value.includes('-')) {
+      return;
+    }
     const newInputs = inputs.map((inputRow, i) =>
       i === row ? inputRow.map((input, j) => j === col ? value : input) : inputRow
     );
@@ -59,24 +66,28 @@ const GridTable = () => {
   };
 
   const handleBuy = async () => {
-    const token = 'eyJzdWIiOiJaUE14VmhHWjV3Tzd0N2xGZzdXZ2RwUW0zZVAyQCMxMTYiLCJleHBpcmVzSW4iOiIxZCIsImlhdCI6MTcxOTMwMDM1OSwiZXhwIjoxNzIxODkyMzU5fQ.OmuaoA95arrvck2A0wp2mMKzI8jXjnHAHGBcSc-V_K8'; // Your token here
-    const config = {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    };
-    const quantities = inputs.map(row => row.reduce((acc, val) => acc + (val === '1' ? 1 : 0), 0));
-    const amounts = quantities.map(qty => qty * 11);
-  
-    const totalAmount = amounts.reduce((acc, amount) => amount, 0);
-    setBalancePoints(totalAmount);
-  
     try {
+      // Fetch new token from backend
+      const responseToken = await axios.get('https://api.klubbl.in/panaboard/newToken');
+      const token = responseToken.data.token;
+
+      const config = {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      };
+
+      const quantities = inputs.map(row => row.reduce((acc, val) => acc + (parseInt(val) || 0), 0));
+      const amounts = quantities.map(qty => qty * 11);
+
+      const totalAmount = amounts.reduce((acc, amount) => acc + amount, 0);
+      setBalancePoints(totalAmount);
+
       const response = await axios.post('https://api.klubbl.in/panaboard/submitBid', {
         quantities,
         amounts
       }, config);
-  
+
       console.log('API Response:', response.data);
       alert('Bid submitted successfully!');
     } catch (error) {
@@ -88,22 +99,23 @@ const GridTable = () => {
       }
     }
   };
-  
+
+  const handleClear = () => {
+    setInputs(Array(4).fill().map(() => Array(10).fill('')));
+  };
+
   return (
     <div className="p-4 text-center relative bg-gray-100">
       <div className="flex justify-between items-center mb-4">
-
         <div className="text-left">
-          <h2 className="text-sm font-bold">Welcome: 8541039703</h2>
+          <h2 className="text-sm font-bold">Welcome: 7264894678</h2>
           <h3 className="text-sm">Balance Points: {balancePoints}</h3>
         </div>
-
-
         <div className="text-right">
           <div className="mt-8 mb-4 flex text-right justify-end">
             <button
               className="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700"
-              onClick={() => window.location.href = '/logout'}
+              onClick={() => window.location.href = '/login'}
             >
               Logout
             </button>
@@ -148,18 +160,18 @@ const GridTable = () => {
                   />
                 </td>
               ))}
-              <td className="border-2 border-gray-400 px-4 py-2">{inputs[i].filter(val => val === '1').length}</td>
-              <td className="border-2 border-gray-400 px-4 py-2">{inputs[i].filter(val => val === '1').length * 11}</td>
-              <td className="border-2 border-gray-400 px-4 py-2">-</td>
+              <td className="border-2 border-gray-400 px-4 py-2">{inputs[i].reduce((acc, val) => acc + (parseInt(val) || 0), 0)}</td>
+              <td className="border-2 border-gray-400 px-4 py-2">{inputs[i].reduce((acc, val) => acc + (parseInt(val) || 0) * 11, 0)}</td>
+              <td className="border-2 border-gray-400 px-4 py-2">NV28</td>
             </tr>
           ))}
           <tr className="border-2 border-gray-400">
             <td colSpan={12} className="border-2 border-gray-400 px-4 py-2 text-center font-bold">Total:</td>
             <td className="border-2 border-gray-400 px-4 py-2">{
-              inputs.reduce((acc, row) => acc + row.filter(val => val === '1').length, 0)
+              inputs.reduce((acc, row) => acc + row.reduce((acc, val) => acc + (parseInt(val) || 0), 0), 0)
             }</td>
             <td className="border-2 border-gray-400 px-4 py-2">{
-              inputs.reduce((acc, row) => acc + row.filter(val => val === '1').length * 11, 0)
+              inputs.reduce((acc, row) => acc + row.reduce((acc, val) => acc + (parseInt(val) || 0) * 11, 0), 0)
             }</td>
             <td className="border-2 border-gray-400 px-4 py-2"></td>
           </tr>
@@ -167,13 +179,23 @@ const GridTable = () => {
       </table>
 
       <div className="flex justify-center mt-8 space-x-4">
-        <button className="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700">ADVANCE</button>
+        <Link to="/advance">
+          <button className="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700">ADVANCE</button>
+        </Link>
         <button className="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700" onClick={handleBuy}>BUY</button>
-        <button className="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700">CLEAR</button>
-        <button className="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700">DEPOSIT</button>
-        <button className="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700">WITHDRAW</button>
-        <button className="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700">REPORTS</button>
-        <button className="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700">RESULTS</button>
+        <button className="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700" onClick={handleClear}>CLEAR</button>
+        <Link to="/deposit">
+          <button className="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700">DEPOSIT</button>
+        </Link>
+        <Link to="/withdraw">
+          <button className="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700">WITHDRAW</button>
+        </Link>
+        <Link to="/report">
+          <button className="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700">REPORTS</button>
+        </Link>
+        <Link to="/results">
+          <button className="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700">RESULTS</button>
+        </Link>
       </div>
 
       <div className="mt-4">
@@ -186,3 +208,4 @@ const GridTable = () => {
 };
 
 export default GridTable;
+
