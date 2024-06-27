@@ -59,6 +59,15 @@ const GridTable = () => {
     if (value === '-' || value.includes('-')) {
       return;
     }
+    if (/[a-zA-Z]/.test(value)) {
+      // If it contains alphabetic characters, do not update inputs
+      return;
+    }
+    if (!/^\d*$/.test(value)) {
+      // If it contains non-numeric characters, do not update inputs
+      return;
+    }
+
     const newInputs = inputs.map((inputRow, i) =>
       i === row ? inputRow.map((input, j) => j === col ? value : input) : inputRow
     );
@@ -80,7 +89,7 @@ const GridTable = () => {
       const quantities = inputs.map(row => row.reduce((acc, val) => acc + (parseInt(val) || 0), 0));
       const amounts = quantities.map(qty => qty * 11);
 
-      const totalAmount = amounts.reduce((acc, amount) =>amount, 0);
+      const totalAmount = amounts.reduce((acc, amount) => acc + amount, 0);
       setBalancePoints(totalAmount);
 
       const response = await axios.post('https://api.klubbl.in/panaboard/submitBid', {
@@ -105,96 +114,109 @@ const GridTable = () => {
   };
 
   return (
-    <div className="p-4 text-center relative bg-gray-100">
-      <div className="flex justify-between items-center mb-4">
-        <div className="text-left">
-          <h2 className="text-sm font-bold">Welcome: 7264894678</h2>
-          <h3 className="text-sm">Balance Points: {balancePoints}</h3>
+    <div className="p-1 md:p-1 lg:p-1 mr-20 ml-20 mt-5 text-center">
+      <div className="flex flex-col md:flex-row justify-between items-center mt-5">
+        <div className="text-left mb-4 md:mb-0 md:text-start">
+          <h2 className="text-sm text-black font-times font-bold">Welcome: 7264894678</h2>
+          <h3 className="text-sm text-black font-times font-semibold">Balance Points: {balancePoints}</h3>
         </div>
         <div className="text-right">
-          <div className="mt-8 mb-4 flex text-right justify-end">
+          <div className="mt-4 mb-2 flex text-right justify-end">
             <button
-              className="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700"
-              onClick={() => window.location.href = '/login'}
-            >
-              Logout
+              className="bg-gradient-to-t from-red-900 to-red-500 text-white px-6 py-1 font-semibold rounded text-lg font-times md:w-auto"
+              onClick={() => window.location.href = '/login'}>
+              LogOut
             </button>
           </div>
-          <h2 className="text-sm font-bold">Gift Event Code: 14:30</h2>
-          <h3 className="text-sm">Countdown: {formattedTime}</h3>
+          <h2 className="text-sm font-times font-bold">Gift Event Code: 14:30</h2>
+          <h3 className="text-sm font-times font-semibold">Countdown: {formattedTime}</h3>
         </div>
       </div>
-      <div className="flex justify-start">
-        <div className="flex">
-          <div className="m-0 p-2 bg-purple-800 rounded-lg text-white mr-2">RESULT ANDAR {'{A}'}</div>
-          <div className="m-0 p-2 bg-purple-800 rounded-lg text-white mr-2">RESULT BAHAR {'{B}'}</div>
-          <div className="m-0 p-2 bg-purple-800 rounded-lg text-white">JODI {'{B}'}</div>
-        </div>
+      <div className="flex justify-start space-x-1">
+        <div className="px-2 py-2 bg-customBlue rounded text-white font-times">RESULT ANDAR {'{A}'}</div>
+        <div className="px-2 py-2 bg-customBlue rounded text-white font-times">RESULT BAHAR {'{B}'}</div>
+        <div className="px-2 py-2 bg-customBlue rounded text-white font-times">JODI {'{B}'}</div>
       </div>
 
-      <table className="w-full table-auto">
-        <thead>
-          <tr className="bg-yellow-200">
-            <th className="border-2 border-gray-400 px-4 py-2">Game Name</th>
-            <th className="border-2 border-gray-400 px-4 py-2">Win</th>
-            {[...Array(10)].map((_, i) => (
-              <th key={i} className="border-2 border-gray-400 px-4 py-2">{i}</th>
-            ))}
-            <th className="border-2 border-gray-400 px-4 py-2">Qty</th>
-            <th className="border-2 border-gray-400 px-4 py-2">Amount</th>
-            <th className="border-2 border-gray-400 px-4 py-2">{currentTime}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {['YANTRA GROUP-NV', 'YANTRA GROUP-RR', 'YANTRA GROUP-RV', 'YANTRA GROUP-CH'].map((name, i) => (
-            <tr key={i} className={i % 2 === 0 ? "bg-gray-200" : ""}>
-              <td className="border-2 border-gray-400 px-4 py-2">{name}</td>
-              <td className="border-2 border-gray-400 px-4 py-2">100</td>
-              {inputs[i].map((input, j) => (
-                <td key={j} className="border-2 border-gray-400 px-4 py-2">
-                  <input
-                    type="text"
-                    className="w-16 h-8 border-2 border-gray-400 text-center"
-                    value={input}
-                    onChange={(e) => handleInputChange(i, j, e.target.value)}
-                  />
-                </td>
+      <div className="overflow-x-auto">
+        <table className="w-full border-collapse border border-black">
+          <thead>
+            <tr className="bg-customPink">
+              <th className="border border-black px-4 py-2 font-times">Game Name</th>
+              <th className="border border-black px-4 py-2 font-times">Win</th>
+              {[...Array(10)].map((_, i) => (
+                <th key={i} className="border border-black px-4 py-2">{i}</th>
               ))}
-              <td className="border-2 border-gray-400 px-4 py-2">{inputs[i].reduce((acc, val) => acc + (parseInt(val) || 0), 0)}</td>
-              <td className="border-2 border-gray-400 px-4 py-2">{inputs[i].reduce((acc, val) => acc + (parseInt(val) || 0) * 11, 0)}</td>
-              <td className="border-2 border-gray-400 px-4 py-2">NV28</td>
+              <th className="border border-black px-4 py-2 font-times">Qty</th>
+              <th className="border border-black px-4 py-2 font-times">Amount</th>
+              <th className="border border-black px-4 py-2 font-times">{currentTime}</th>
             </tr>
-          ))}
-          <tr className="border-2 border-gray-400">
-            <td colSpan={12} className="border-2 border-gray-400 px-4 py-2 text-center font-bold">Total:</td>
-            <td className="border-2 border-gray-400 px-4 py-2">{
-              inputs.reduce((acc, row) => acc + row.reduce((acc, val) => acc + (parseInt(val) || 0), 0), 0)
-            }</td>
-            <td className="border-2 border-gray-400 px-4 py-2">{
-              inputs.reduce((acc, row) => acc + row.reduce((acc, val) => acc + (parseInt(val) || 0) * 11, 0), 0)
-            }</td>
-            <td className="border-2 border-gray-400 px-4 py-2"></td>
-          </tr>
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {['YANTRA GROUP-NV', 'YANTRA GROUP-RR', 'YANTRA GROUP-RV', 'YANTRA GROUP-CH'].map((name, i) => (
+              <tr key={i} className={i % 2 === 0 ? "" : ""}>
+                <td className="border border-black px-4 py-2 font-times">{name}</td>
+                <td className="border border-black px-4 py-2 font-times">100</td>
+                {inputs[i].map((input, j) => (
+                  <td key={j} className="border border-black px-4 py-2">
+                    <input
+                      type="text"
+                      className="w-full md:w-12 h-10 border border-black text-center"
+                      value={input}
+                      onChange={(e) => handleInputChange(i, j, e.target.value)}
+                    />
+                  </td>
+                ))}
+                <td className="border border-black px-4 py-2 font-times">{inputs[i].reduce((acc, val) => acc + (parseInt(val) || 0), 0)}</td>
+                <td className="border border-black px-4 py-2 font-times">{inputs[i].reduce((acc, val) => acc + (parseInt(val) || 0) * 11, 0)}</td>
+                <td className="border border-black px-4 py-2 font-times">{i === 0 ? 'NV25' : i === 1 ? 'RR66' : i === 2 ? 'RY82' : i === 3 ? 'CH63' : ''}</td>
+              </tr>
+            ))}
+            <tr className="border border-black">
+              <td colSpan={12} className="border border-black px-4 py-2 text-end font-bold font-times">Total:</td>
+              <td className="border border-black px-4 py-2 font-times">
+                {inputs.reduce((acc, row) => acc + row.reduce((acc, val) => acc + (parseInt(val) || 0), 0), 0)}
+              </td>
+              <td className="border border-black px-4 py-2 font-times">
+                {inputs.reduce((acc, row) => acc + row.reduce((acc, val) => acc + (parseInt(val) || 0) * 11, 0), 0)}
+              </td>
+              <td className="border border-black px-4 py-2"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-      <div className="flex justify-center mt-8 space-x-4">
-        <Link to="/advance">
-          <button className="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700">ADVANCE</button>
-        </Link>
-        <button className="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700" onClick={handleBuy}>BUY</button>
-        <button className="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700" onClick={handleClear}>CLEAR</button>
-        <Link to="/deposit">
-          <button className="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700">DEPOSIT</button>
+      <div className="flex flex-col md:flex-row justify-center mt-8 space-y-4 md:space-y-0 md:space-x-4">
+
+        <button className="bg-gradient-to-t from-red-900 to-red-500 text-white px-5  py-2 font-semibold rounded-lg text-sm font-times md:w-auto">
+          ADVANCE
+        </button>
+
+        <button className="bg-gradient-to-t from-red-900 to-red-500 text-white px-5  py-2 font-semibold rounded-lg text-sm font-times md:w-auto" onClick={handleBuy}>
+          BUY
+        </button>
+        <button className="bg-gradient-to-t from-red-900 to-red-500 text-white px-5  py-2 font-semibold rounded-lg text-sm font-times md:w-auto" onClick={handleClear}>
+          CLEAR
+        </button>
+        <Link to="/deposite">
+          <button className="bg-gradient-to-t from-red-900 to-red-500 text-white px-5  py-2 font-semibold rounded-lg text-sm font-times md:w-auto">
+            DEPOSIT
+          </button>
         </Link>
         <Link to="/withdraw">
-          <button className="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700">WITHDRAW</button>
+          <button className="bg-gradient-to-t from-red-900 to-red-500 text-white px-5  py-2 font-semibold rounded-lg text-sm font-times md:w-auto">
+            WITHDRAW
+          </button>
         </Link>
         <Link to="/report">
-          <button className="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700">REPORTS</button>
+          <button className="bg-gradient-to-t from-red-900 to-red-500 text-white px-5  py-2 font-semibold rounded-lg text-sm font-times md:w-auto">
+            REPORTS
+          </button>
         </Link>
         <Link to="/results">
-          <button className="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700">RESULTS</button>
+          <button className="bg-gradient-to-t from-red-900 to-red-500 text-white px-5  py-2 font-semibold rounded-lg text-sm font-times md:w-auto">
+            RESULTS
+          </button>
         </Link>
       </div>
 
@@ -208,4 +230,3 @@ const GridTable = () => {
 };
 
 export default GridTable;
-

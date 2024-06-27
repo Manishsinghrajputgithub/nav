@@ -7,8 +7,13 @@ module.exports = {
   ],
   theme: {
     extend: {
+      colors: {
+        customBlue: '#020D6A',
+        customPink:"rgb(252, 238, 192)",
+      },
       fontFamily: {
         'inter': ['Inter', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'],
+        'times': ['Times New Roman', 'Times', 'serif'],
       },
     },
     
