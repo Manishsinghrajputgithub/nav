@@ -27,7 +27,7 @@ const Withdraw = () => {
   return (
     <div className="p-10 md:p-20 text-center relative font-serif bg-gray-100 min-h-screen">
       <h2 className="text-3xl md:text-4xl mb-10 font-bold text-red-700">Withdraw</h2>
-      <div className="flex justify-between items-center ">
+      <div className="flex justify-between items-center">
         <div className="flex font-bold text-sm cursor-pointer space-x-1">
           <div className="py-2.5 px-5 bg-red-600 rounded text-white text-center hover:bg-red-700 transition" onClick={() => navigate('/payroom')}>Payroom</div>
           <div className="py-2.5 px-5 bg-yellow-400 rounded text-black text-center">Withdraw</div>

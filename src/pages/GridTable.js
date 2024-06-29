@@ -9,8 +9,9 @@ const GridTable = () => {
   const [balancePoints, setBalancePoints] = useState(10);
   const [currentTime, setCurrentTime] = useState('');
   const [timeLeft, setTimeLeft] = useState(900);
-  const { state } = useLocation(); // Access location state to get username
+  const [giftEventCode, setGiftEventCode] = useState('');
 
+  const { state } = useLocation(); // Access location state to get username
   const username = state ? state.username : ''; // Retrieve username from location state
 
   useEffect(() => {
@@ -40,9 +41,26 @@ const GridTable = () => {
   }, []);
 
   useEffect(() => {
+    // Set the initial gift event code to the next 15-minute interval
+    const now = new Date();
+    const minutes = now.getMinutes();
+    const remainder = minutes % 15;
+    const nextInterval = remainder === 0 ? 15 : 15 - remainder;
+    now.setMinutes(minutes + nextInterval);
+  
+    const updatedHours = now.getHours().toString().padStart(2, '0');
+    const updatedMinutes = now.getMinutes().toString().padStart(2, '0');
+    setGiftEventCode(`${updatedHours}:${updatedMinutes}`);
+  }, []);
+
+  useEffect(() => {
     const timer = setTimeout(() => {
       if (timeLeft > 0) {
         setTimeLeft(timeLeft - 1);
+      } else {
+        // Add 15 minutes to giftEventCode when countdown completes
+        addFifteenMinutes();
+        setTimeLeft(900); // Reset the countdown to 15 minutes
       }
     }, 1000);
 
@@ -50,10 +68,15 @@ const GridTable = () => {
     return () => clearTimeout(timer);
   }, [timeLeft]);
 
-  // Format the time into MM:SS
-  const minutes = Math.floor(timeLeft / 60);
-  const seconds = timeLeft % 60;
-  const formattedTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  const addFifteenMinutes = () => {
+    const [hours, minutes] = giftEventCode.split(':').map(Number);
+    const newMinutes = minutes + 15;
+    const newHours = (hours + Math.floor(newMinutes / 60)) % 24;
+    const updatedMinutes = newMinutes % 60;
+    const formattedHours = newHours.toString().padStart(2, '0');
+    const formattedMinutes = updatedMinutes.toString().padStart(2, '0');
+    setGiftEventCode(`${formattedHours}:${formattedMinutes}`);
+  };
 
   const handleInputChange = (row, col, value) => {
     if (value === '-' || value.includes('-')) {
@@ -113,22 +136,32 @@ const GridTable = () => {
     setInputs(Array(4).fill().map(() => Array(10).fill('')));
   };
 
+  const formatTime = (seconds) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+  };
+
+  const formattedTime = formatTime(timeLeft);
+
   return (
     <div className="p-1 md:p-1 lg:p-1 mr-20 ml-20 mt-5 text-center">
       <div className="flex flex-col md:flex-row justify-between items-center mt-5">
         <div className="text-left mb-4 md:mb-0 md:text-start">
-          <h2 className="text-sm text-black font-times font-bold">Welcome: 7264894678</h2>
+          <h2 className="text-sm text-black font-times font-bold">Welcome: {username}</h2>
           <h3 className="text-sm text-black font-times font-semibold">Balance Points: {balancePoints}</h3>
         </div>
         <div className="text-right">
           <div className="mt-4 mb-2 flex text-right justify-end">
+          <Link to="/login">
             <button
               className="bg-gradient-to-t from-red-900 to-red-500 text-white px-6 py-1 font-semibold rounded text-lg font-times md:w-auto"
-              onClick={() => window.location.href = '/login'}>
+            >
               LogOut
             </button>
+            </Link>
           </div>
-          <h2 className="text-sm font-times font-bold">Gift Event Code: 14:30</h2>
+          <h2 className="text-sm font-times font-bold">Gift Event Code: {giftEventCode}</h2>
           <h3 className="text-sm font-times font-semibold">Countdown: {formattedTime}</h3>
         </div>
       </div>
@@ -139,82 +172,81 @@ const GridTable = () => {
       </div>
 
       <div className="overflow-x-auto">
-        <table className="w-full border-collapse border border-black">
+        <table className="w-full border-2 border-gray-800 border-solid border-separate border-collapse border-double">
           <thead>
             <tr className="bg-customPink">
-              <th className="border border-black px-4 py-2 font-times">Game Name</th>
-              <th className="border border-black px-4 py-2 font-times">Win</th>
+              <th className="border-2 border-gray-800 border-solid border-separate border-collapse border-double px-4 py-2 font-times">Game Name</th>
+              <th className="border-2 border-gray-800 border-solid border-separate border-collapse border-double px-4 py-2 font-times">Win</th>
               {[...Array(10)].map((_, i) => (
-                <th key={i} className="border border-black px-4 py-2">{i}</th>
+                <th key={i} className="border-2 border-gray-800 border-solid border-separate border-collapse border-double px-4 py-2">{i}</th>
               ))}
-              <th className="border border-black px-4 py-2 font-times">Qty</th>
-              <th className="border border-black px-4 py-2 font-times">Amount</th>
-              <th className="border border-black px-4 py-2 font-times">{currentTime}</th>
+              <th className="border-2 border-gray-800 border-solid border-separate border-collapse border-double px-4 py-2 font-times">Qty</th>
+              <th className="border-2 border-gray-800 border-solid border-separate border-collapse border-double px-4 py-2 font-times">Amount</th>
+              <th className="border-2 border-gray-800 border-solid border-separate border-collapse border-double px-4 py-2 font-times">{currentTime}</th>
             </tr>
           </thead>
           <tbody>
             {['YANTRA GROUP-NV', 'YANTRA GROUP-RR', 'YANTRA GROUP-RV', 'YANTRA GROUP-CH'].map((name, i) => (
               <tr key={i} className={i % 2 === 0 ? "" : ""}>
-                <td className="border border-black px-4 py-2 font-times">{name}</td>
-                <td className="border border-black px-4 py-2 font-times">100</td>
+                <td className="border-2 border-gray-800 border-solid border-separate border-collapse border-double px-4 py-2 font-times">{name}</td>
+                <td className="border-2 border-gray-800 border-solid border-separate border-collapse border-double px-4 py-2 font-times">100</td>
                 {inputs[i].map((input, j) => (
-                  <td key={j} className="border border-black px-4 py-2">
+                  <td key={j} className="border-2 border-gray-800 border-solid border-separate border-collapse border-double px-4 py-2">
                     <input
                       type="text"
-                      className="w-full md:w-12 h-10 border border-black text-center"
+                      className="w-full md:w-12 h-10 border-2 border-gray-800 border-solid border-separate border-collapse border-double text-center"
                       value={input}
                       onChange={(e) => handleInputChange(i, j, e.target.value)}
                     />
                   </td>
                 ))}
-                <td className="border border-black px-4 py-2 font-times">{inputs[i].reduce((acc, val) => acc + (parseInt(val) || 0), 0)}</td>
-                <td className="border border-black px-4 py-2 font-times">{inputs[i].reduce((acc, val) => acc + (parseInt(val) || 0) * 11, 0)}</td>
-                <td className="border border-black px-4 py-2 font-times">{i === 0 ? 'NV25' : i === 1 ? 'RR66' : i === 2 ? 'RY82' : i === 3 ? 'CH63' : ''}</td>
+                <td className="border-2 border-gray-800 border-solid border-separate border-collapse border-double px-4 py-2 font-times">{inputs[i].reduce((acc, val) => acc + (parseInt(val) || 0), 0)}</td>
+                <td className="border-2 border-gray-800 border-solid border-separate border-collapse border-double px-4 py-2 font-times">{inputs[i].reduce((acc, val) => acc + (parseInt(val) || 0) * 11, 0)}</td>
+                <td className="border-2 border-gray-800 border-solid border-separate border-collapse border-double px-4 py-2 font-times">{i === 0 ? 'NV25' : i === 1 ? 'RR66' : i === 2 ? 'RY82' : i === 3 ? 'CH63' : ''}</td>
               </tr>
             ))}
-            <tr className="border border-black">
-              <td colSpan={12} className="border border-black px-4 py-2 text-end font-bold font-times">Total:</td>
-              <td className="border border-black px-4 py-2 font-times">
+            <tr className="border-2 border-gray-800 border-solid border-separate border-collapse border-double">
+              <td colSpan={12} className="border-2 border-gray-800 border-solid border-separate border-collapse border-double px-4 py-2 text-end font-bold font-times">Total:</td>
+              <td className="border-2 border-gray-800 border-solid border-separate border-collapse border-double px-4 py-2 font-times">
                 {inputs.reduce((acc, row) => acc + row.reduce((acc, val) => acc + (parseInt(val) || 0), 0), 0)}
               </td>
-              <td className="border border-black px-4 py-2 font-times">
+              <td className="border-2 border-gray-800 border-solid border-separate border-collapse border-double px-4 py-2 font-times">
                 {inputs.reduce((acc, row) => acc + row.reduce((acc, val) => acc + (parseInt(val) || 0) * 11, 0), 0)}
               </td>
-              <td className="border border-black px-4 py-2"></td>
+              <td className="border-2 border-gray-800 border-solid border-separate border-collapse border-double px-4 py-2"></td>
             </tr>
           </tbody>
         </table>
       </div>
 
       <div className="flex flex-col md:flex-row justify-center mt-8 space-y-4 md:space-y-0 md:space-x-4">
-
-        <button className="bg-gradient-to-t from-red-900 to-red-500 text-white px-5  py-2 font-semibold rounded-lg text-sm font-times md:w-auto">
+        <button className="bg-gradient-to-t from-red-900 to-red-500 text-white px-5 py-2 font-semibold rounded-lg text-sm font-times md:w-auto">
           ADVANCE
         </button>
 
-        <button className="bg-gradient-to-t from-red-900 to-red-500 text-white px-5  py-2 font-semibold rounded-lg text-sm font-times md:w-auto" onClick={handleBuy}>
+        <button className="bg-gradient-to-t from-red-900 to-red-500 text-white px-5 py-2 font-semibold rounded-lg text-sm font-times md:w-auto" onClick={handleBuy}>
           BUY
         </button>
-        <button className="bg-gradient-to-t from-red-900 to-red-500 text-white px-5  py-2 font-semibold rounded-lg text-sm font-times md:w-auto" onClick={handleClear}>
+        <button className="bg-gradient-to-t from-red-900 to-red-500 text-white px-5 py-2 font-semibold rounded-lg text-sm font-times md:w-auto" onClick={handleClear}>
           CLEAR
         </button>
         <Link to="/deposite">
-          <button className="bg-gradient-to-t from-red-900 to-red-500 text-white px-5  py-2 font-semibold rounded-lg text-sm font-times md:w-auto">
+          <button className="bg-gradient-to-t from-red-900 to-red-500 text-white px-5 py-2 font-semibold rounded-lg text-sm font-times md:w-auto">
             DEPOSIT
           </button>
         </Link>
         <Link to="/withdraw">
-          <button className="bg-gradient-to-t from-red-900 to-red-500 text-white px-5  py-2 font-semibold rounded-lg text-sm font-times md:w-auto">
+          <button className="bg-gradient-to-t from-red-900 to-red-500 text-white px-5 py-2 font-semibold rounded-lg text-sm font-times md:w-auto">
             WITHDRAW
           </button>
         </Link>
         <Link to="/report">
-          <button className="bg-gradient-to-t from-red-900 to-red-500 text-white px-5  py-2 font-semibold rounded-lg text-sm font-times md:w-auto">
+          <button className="bg-gradient-to-t from-red-900 to-red-500 text-white px-5 py-2 font-semibold rounded-lg text-sm font-times md:w-auto">
             REPORTS
           </button>
         </Link>
         <Link to="/results">
-          <button className="bg-gradient-to-t from-red-900 to-red-500 text-white px-5  py-2 font-semibold rounded-lg text-sm font-times md:w-auto">
+          <button className="bg-gradient-to-t from-red-900 to-red-500 text-white px-5 py-2 font-semibold rounded-lg text-sm font-times md:w-auto">
             RESULTS
           </button>
         </Link>
