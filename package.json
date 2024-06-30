@@ -13,6 +13,7 @@
     "cors-anywhere": "^0.4.4",
     "dotenv": "^16.4.5",
     "firebase": "^10.12.2",
+    "firebaseui": "^6.1.0",
     "path-browserify": "^1.0.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

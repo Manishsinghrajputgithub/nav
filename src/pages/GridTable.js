@@ -11,9 +11,8 @@ const GridTable = () => {
   const [timeLeft, setTimeLeft] = useState(900);
   const [giftEventCode, setGiftEventCode] = useState('');
 
-  const { state } = useLocation(); // Access location state to get username
-  const username = state ? state.username : ''; // Retrieve username from location state
-
+  const { state } = useLocation(); // Access location state to get phoneNumber
+  const phoneNumber = state ? state.phoneNumber : ''; 
   useEffect(() => {
     const firstLogin = localStorage.getItem('firstLogin');
     if (!firstLogin) {
@@ -148,7 +147,7 @@ const GridTable = () => {
     <div className="p-1 md:p-1 lg:p-1 mr-20 ml-20 mt-5 text-center">
       <div className="flex flex-col md:flex-row justify-between items-center mt-5">
         <div className="text-left mb-4 md:mb-0 md:text-start">
-          <h2 className="text-sm text-black font-times font-bold">Welcome: {username}</h2>
+          <h2 className="text-sm text-black font-times font-bold">Welcome: {phoneNumber}</h2>
           <h3 className="text-sm text-black font-times font-semibold">Balance Points: {balancePoints}</h3>
         </div>
         <div className="text-right">
